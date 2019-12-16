@@ -1,0 +1,24 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: consumer
+  labels:
+    app: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+        - name: consumer
+          image: kubilayceylan/consumer
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_CONNECTION_STRING
+              value: "mongodb://kubi:kubi@172.21.29.176:27017/sampledb"

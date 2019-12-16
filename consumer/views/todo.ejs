@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>To-do List</title>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"
+        integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+        crossorigin="anonymous"></script>
+        <link rel="stylesheet" type="text/css" href="/assets/styles.css" />
+        <script src="/assets/todo-list.js"></script>
+    </head>
+    <body>
+        <h1>My Todo List</h1>
+        <div id="todo-table">
+            <ul>
+                <% for(var i=0; i<todos.length; i++){ %>
+                    <li><%= todos[i].item %></li>
+                <% } %>
+            </ul>
+        </div>
+    </body>
+
+</html>

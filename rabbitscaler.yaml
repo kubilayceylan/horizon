@@ -1,0 +1,71 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: rabbit-pod-autoscaler
+rules:
+  - apiGroups: ["*"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "list", "update"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rabbit-pod-autoscaler
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: rabbit-pod-autoscaler
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rabbit-pod-autoscaler
+subjects:
+  - kind: ServiceAccount
+    name: rabbit-pod-autoscaler
+    namespace: kube-system
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rabbit-pod-autoscaler
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbit-pod-autoscaler
+    spec:
+      nodeSelector:
+        kubernetes.io/role: master
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+      serviceAccountName: rabbit-pod-autoscaler
+      containers:
+        - name: rabbit-pod-autoscaler
+          image: onfido/k8s-rabbit-pod-autoscaler
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          env:
+            - name: INTERVAL
+              value: "5"
+            - name: RABBIT_HOST
+              value: "172.21.239.237:5672"
+            - name: RABBIT_USER
+              value: "rabbitmq"
+            - name: RABBIT_PASS
+              value: "password"
+            - name: AUTOSCALING
+              value: >
+                1|5|2|kubilay|consumer|load_queue;
+            - name: LOGS
+              value: HIGH
+            - name: SLACK_HOOK
+              value: "https://hooks.slack.com/services/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"
